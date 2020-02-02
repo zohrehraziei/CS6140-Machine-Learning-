@@ -1,3 +1,12 @@
+
+"""
+Created on Fri Jan 31 2020
+
+Gumbel Distribution
+
+Author: Zohreh Raziei - raziei.z@husky.neu.edu
+"""
+
 import numpy as np
 import matplotlib.pyplot as plt
 
