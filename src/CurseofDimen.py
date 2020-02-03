@@ -1,8 +1,15 @@
-## import the necessary librabries
+
+"""
+Created on Fri Feb 02 2020
+
+Curse of Dimentionality
+
+Author: Zohreh Raziei - raziei.z@husky.neu.edu
+"""
 
 import numpy as np
 import matplotlib.pyplot as plt
-import math as mth
+#import math as mth
 from tqdm import tqdm
 
 # define value of n
@@ -14,13 +21,9 @@ k = [1,25,50,100]
 
 
 '''
-
-We declare a function which calculate the distance between two vector by calculating the square root of the sum of the square of the difference
+I declare a function which calculate the distance between two vector by calculating the square root of the sum of the square of the difference
 between each point.
-
 '''
-
-
 # Distance function
 def Distance(i,j,dp,dimension):
     sum=0
@@ -30,11 +33,8 @@ def Distance(i,j,dp,dimension):
     return distance
 
 '''
-
-We store each point distance with each other and store them in an array.
-
+I store each point distance with each other and store them in an array.
 '''
-
 
 ## Calucate distance between all the points
 def Difference(dim,dp):
@@ -62,7 +62,6 @@ Now we will take last element as maximum value element
 and nth index element of the array as minimum element as upto index n distance will be zero 
 because those are the same points.
 Now we will apply the given function to calulate the final value
-
 
 '''
 
@@ -96,14 +95,11 @@ for n in ns:
     
 
 '''
-
 We will plot between k and r(k) function.
 We will represent plot both for n = 100 and  n = 1000
 in a single plot for comparison.
 
 k value is in x axis and r(k) is in y axis.
-
-
 '''
 
 
