@@ -47,13 +47,13 @@ def estimating_parameters(X, epochs, gema):
     return beta, alpha
 
 
-def visualization(data, beta , alpha):
+def visualization(data, beta , alpha, dis):
     # getting parameters with the help of moment generating function
     b = (np.std(data) * np.sqrt(6)) / np.pi
     a = np.mean(data) - (0.57721 * beta)
 
     #getting parameters with help of parameters estimations
-   # b_prediction, a_prediction = estimating_parameters(data, max_iters, gema) # 
+    b_prediction, a_prediction = estimating_parameters(data, max_iters, gema) #
 
     # visulization
     count, bins, ignored = plt.hist(data, 30, density=True)
@@ -63,20 +63,23 @@ def visualization(data, beta , alpha):
              linewidth=2, label='Original KDE', color='g')
     # plt method of moment/ predicted KDE
     plt.plot(bins, (1 / b) * np.exp(-(bins - m) / b)
-             * np.exp(-np.exp(-(bins - m) / b)),
-             linewidth=2, label='Predicted KDE', color='r')
-    plt.title('Histogram of the Samples')
+             * np.exp(-np.exp(-(bins - a) / b)),
+             linewidth=2, label='Moment KDE', color='r')
+    plt.plot(bins, (1 / b_prediction) * np.exp(-(bins - a_prediction) / b_prediction)
+             * np.exp(-np.exp(-(bins - a_prediction) / b_prediction)),
+             linewidth=2, label='Predicted KDE', color='y')
+    plt.title('Histogram of the Samples({})'.format(dis))
     plt.xlabel('Bins')
     plt.ylabel('Count')
     plt.legend(loc="upper right")
-    plt.savefig('image_name.png')
+    #plt.savefig('image_name.png')
     plt.show()
 
 
 if __name__ == "__main__":
-    alpha, beta = 3, 2  # location and scale
-    n = [100, 1000]  # add 10000
-    max_iters = 1000  # Maximum number of iterations
+    alpha, beta = 1, 2  # location and scale
+    n = [100, 1000, 10000]  # add 10000
+    max_iters = 1000 # Maximum number of iterations
     gema = 0.001
     # create 10 set for every n and randomly create gumbel distribution
     dataset = [np.random.gumbel(alpha, beta, j) for i in range(10) for j in n]
@@ -90,4 +93,6 @@ if __name__ == "__main__":
         std = (beta * np.pi) / (np.sqrt(6))
         print("Mean : {0}  Std : {1} α : {2}  β : {3}".format(mean, std, m, b))
 
-    visualization(dataset[2], beta, alpha)
+    visualization(dataset[1], beta, alpha, 100)
+    visualization(dataset[12], beta, alpha, 1000)
+    visualization(dataset[23], beta, alpha, 10000)
