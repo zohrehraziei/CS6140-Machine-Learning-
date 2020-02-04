@@ -21,8 +21,8 @@ k = [1,25,50,100]
 
 
 '''
-I declare a function which calculate the distance between two vector by calculating the square root of the sum of the square of the difference
-between each point.
+Distance between two vector: calculating the square root of the sum of the square of the difference
+between each point
 '''
 # Distance function
 def Distance(i,j,dp,dimension):
@@ -55,13 +55,10 @@ value_list=[]
 
 
 '''
-Now we will iterate through n = [100, 1000]
-for value of k = [1,100]
-We will sort distance array. 
-Now we will take last element as maximum value element
-and nth index element of the array as minimum element as upto index n distance will be zero 
-because those are the same points.
-Now we will apply the given function to calulate the final value
+Iterate through n = [100, 1000] for value of k = [1,100]
+Sort distance array
+Take last element as maximum value element, and nth index element of the array as minimum element as upto index n distance will be zero 
+Apply the given function to calulate the final value
 
 '''
 
@@ -95,10 +92,8 @@ for n in ns:
     
 
 '''
-We will plot between k and r(k) function.
-We will represent plot both for n = 100 and  n = 1000
-in a single plot for comparison.
-
+Plot between k and r(k) function.
+Represent plot both for n = 100 and  n = 1000
 k value is in x axis and r(k) is in y axis.
 '''
 
