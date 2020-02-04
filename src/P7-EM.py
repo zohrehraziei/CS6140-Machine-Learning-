@@ -1,3 +1,11 @@
+
+"""
+Created on Fri Feb 03 2020
+
+Problem 7: Parameter Estimation for Mixture Model
+
+Author: Zohreh Raziei - raziei.z@husky.neu.edu
+"""
 import numpy as np
 
 mu = 3
