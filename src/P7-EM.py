@@ -66,11 +66,11 @@ while (step <= max_step - 1):
     
     
   
-    alpha_new = alpha - lr * sum((1/beta) - np.exp(-(dx-alpha)/beta)*1/beta);
+    alpha_new = alpha + lr * sum((1/beta) - np.exp(-(dx-alpha)/beta)*1/beta);
     t_alpha[step, 0]= alpha_new
     
     
-    beta_new = beta - lr * ((-(m/beta) + sum((dx-alpha)/(beta**2)))+ sum((np.exp(-(dx-alpha)/beta))*(dx-alpha)/(beta**2)))
+    beta_new = beta + lr * ((-(m/beta) + sum((dx-alpha)/(beta**2)))+ sum((np.exp(-(dx-alpha)/beta))*(dx-alpha)/(beta**2)))
     t_beta[step, 0] = beta_new
     
     mu_tmp = (p_2_x * dx)
