@@ -8,10 +8,14 @@ Author: Zohreh Raziei - raziei.z@husky.neu.edu
 
 """
 
+#!/usr/bin/env python
+# coding: utf-8
+
+# # <center>Dataset : 1 </center>
 
 # ## 1. Minimizing Sum of squared Error
 
-# In[290]:
+# In[1]:
 
 
 #Install dependecy
@@ -26,7 +30,7 @@ from sklearn.metrics import r2_score
 get_ipython().run_line_magic('matplotlib', 'inline')
 
 
-# In[291]:
+# In[2]:
 
 
 # load the dataset
@@ -40,7 +44,7 @@ df.columns = ['CRIM', 'ZN', 'INDUS', 'CHAS',
 df.head()
 
 
-# In[292]:
+# In[3]:
 
 
 # making data
@@ -48,13 +52,13 @@ X = X = df.iloc[:,[0,5]].values
 y = df['MEDV'].values
 
 
-# In[293]:
+# In[4]:
 
 
 X.shape
 
 
-# In[294]:
+# In[5]:
 
 
 # No of examples 
@@ -71,7 +75,7 @@ theta = np.zeros((n,1))
 X_ = np.append(np.ones((m, 1)), X,axis=1)
 
 
-# In[295]:
+# In[6]:
 
 
 # Compute Cost function
@@ -82,7 +86,7 @@ def computeCost(X, y, theta):
     return J
 
 
-# In[296]:
+# In[7]:
 
 
 # Calucating cost function and theta
@@ -111,25 +115,25 @@ def gradientDescent(X, y, theta, alpha, num_iters):
     return final_theta,J_history[len(J_history)-1]
 
 
-# In[297]:
+# In[8]:
 
 
 X_.shape
 
 
-# In[298]:
+# In[9]:
 
 
 y.shape
 
 
-# In[299]:
+# In[10]:
 
 
 theta.shape
 
 
-# In[300]:
+# In[11]:
 
 
 final_theta,loss = gradientDescent(X_, y, theta, 0.01, 10000)
@@ -137,108 +141,83 @@ print('loss :',loss)
 print('final theta :',final_theta)
 
 
-# In[301]:
+# In[12]:
 
 
 y_pred = final_theta[0]* X_[:,0] + final_theta[1] * X_[:,1] + final_theta[2] * X_[:,2]
-
-
-# In[302]:
-
-
 print('R2 score For Dataset 1 (MSE): ',r2_score(y,y_pred))
 
 
 # ## 2. Minimising sum of distance
 
-# In[198]:
+# In[13]:
 
 
-# load the dataset
-
-df = pd.read_csv('ex1data1.txt',names = ['Population','Profit'])
-df.head()
-
-
-# In[199]:
-
-
-# making data
-X = df['Population'].values
-y = df['Profit'].values
-
-
-# In[232]:
-
-
-# Total Least Squares:
-def line_total_least_squares(x,y):
-    n = len(x)
+import numpy.linalg as la
+def tls(X,y):
     
-    x_ = np.sum(x)/n
-    y_ = np.sum(y)/n
+    if X.ndim is 1: 
+        n = 1 # the number of variable of X
+        X = X.reshape(len(X),1)
+    else:
+        n = np.array(X).shape[1] 
     
-    # Calculate the x~ and y~ 
-    x1 = x - x_
-    y1 = y - y_
+    Z = np.vstack((X.T,y)).T
+    U, s, Vt = la.svd(Z, full_matrices=True)
     
-    # Create the matrix array
-    X = np.vstack((x1, y1))
-    print(X.shape)
-    X_t = np.transpose(X)
+    V = Vt.T
+    Vxy = V[:n,n:]
+    Vyy = V[n:,n:]
+    a_tls = - Vxy  / Vyy # total least squares soln
     
-    # Finding A_T_A and it's Find smallest eigenvalue::
-    prd = np.dot(X,X_t)
-    W,V = np.linalg.eig(prd)
-    small_eig_index = W.argmin()
-    a,b = V[:,small_eig_index] 
+    Xtyt = - Z.dot(V[:,n:]).dot(V[:,n:].T)
+    Xt = Xtyt[:,:n] # X error
+    y_tls = (X+Xt).dot(a_tls)
+    fro_norm = la.norm(Xtyt, 'fro')
     
-    # Compute C:
-    c = (-1*a*x_) + (-1*b*y_)
-    
-    return a,b,c
+    return a_tls
 
 
-# In[233]:
+# In[14]:
 
 
-a1,b1,c1 = line_total_least_squares(X,y)
+final_theta = tls(X_,y)
 
 
-# In[ ]:
+# In[15]:
 
 
-x_line = np.arange(1,23).reshape(-1,1)
-y_line = (-1*(c1/b1)) + x_line * -1*(a1/b1)
+final_theta
 
 
-# In[ ]:
+# In[16]:
 
 
-plt.scatter(df['Population'],df['Profit'],c='r',label='given')
-plt.xlabel('Population')
-plt.ylabel('Profit')
-plt.plot(x_line,y_line,label='predicted')
-plt.legend()
-plt.title('Minimising sum of distance : Dataset 1')
-plt.show()
+y_pred = final_theta[0]* X_[:,0] + final_theta[1] * X_[:,1] + final_theta[2] * X_[:,2]
+print('R2 score For Dataset 1 (MSD): ',r2_score(y,y_pred))
 
 
 # ## 3. Closed Form Solution
 
-# In[247]:
+# In[17]:
+
+
+X.shape
+
+
+# In[18]:
 
 
 X_ = np.append(X,np.ones((m, 1)) ,axis=1)
 
 
-# In[248]:
+# In[19]:
 
 
 X_.shape
 
 
-# In[249]:
+# In[20]:
 
 
 # calculate coefficients using closed-form solution
@@ -246,21 +225,22 @@ from numpy.linalg import inv
 coeffs = inv(X_.transpose().dot(X_)).dot(X_.transpose()).dot(y.reshape(-1,1))
 
 
-# In[250]:
+# In[21]:
 
 
 coeffs
 
 
-# In[ ]:
+# In[22]:
 
 
-
+y_pred = coeffs[0]* X_[:,0] + coeffs[1] * X_[:,1] + coeffs[2] * X_[:,2]
+print('R2 score For Dataset 1 (CFS) : ',r2_score(y,y_pred))
 
 
 # # <center>Dataset : 2</center>
 
-# In[303]:
+# In[23]:
 
 
 X, y = make_regression(n_samples=100,n_features=3,noise=10)
@@ -268,7 +248,7 @@ X, y = make_regression(n_samples=100,n_features=3,noise=10)
 
 # ## 1. Minimizing Sum of squared Error
 
-# In[305]:
+# In[24]:
 
 
 # No of examples 
@@ -285,7 +265,7 @@ theta = np.zeros((n,1))
 X_ = np.append(np.ones((m, 1)), X,axis=1)
 
 
-# In[306]:
+# In[25]:
 
 
 final_theta,loss = gradientDescent(X_, y, theta, 0.6, 200)
@@ -293,54 +273,43 @@ print('loss :',loss)
 print('final theta :',final_theta)
 
 
-# In[307]:
+# In[26]:
 
 
 y_pred = final_theta[0]* X_[:,0] + final_theta[1] * X_[:,1] + final_theta[2] * X_[:,2] + final_theta[3] * X_[:,3]
-
-
-# In[308]:
-
-
 print('R2 score For Dataset 2 (MSE): ',r2_score(y,y_pred))
 
 
 # ## 2. Minimising sum of distance
 
-# In[ ]:
+# In[27]:
 
 
-a1,b1,c1 = line_total_least_squares(X.reshape(-1),y)
+final_theta = tls(X_,y)
 
 
-# In[ ]:
+# In[28]:
 
 
-x_line = np.arange(-5,5).reshape(-1,1)
-y_line = (-1*(c1/b1)) + x_line * -1*(a1/b1)
+final_theta
 
 
-# In[ ]:
+# In[29]:
 
 
-plt.scatter(X,y,c='r',label='Original')
-plt.xlabel('X')
-plt.ylabel('y')
-plt.plot(x_line,y_line,label='predicted')
-plt.legend()
-plt.title('Minimising sum of distance : Dataset 2')
-plt.show()
+y_pred = final_theta[0]* X_[:,0] + final_theta[1] * X_[:,1] + final_theta[2] * X_[:,2] + final_theta[3] * X_[:,3]
+print('R2 score For Dataset 2 (MSD): ',r2_score(y,y_pred))
 
 
 # ## 3. Closed Form Solution
 
-# In[ ]:
+# In[30]:
 
 
-X_ = np.append(X.reshape((-1,1)),np.ones((m, 1)) ,axis=1)
+X_ = np.append(X,np.ones((m, 1)) ,axis=1)
 
 
-# In[ ]:
+# In[31]:
 
 
 # calculate coefficients using closed-form solution
@@ -348,40 +317,22 @@ from numpy.linalg import inv
 coeffs = inv(X_.transpose().dot(X_)).dot(X_.transpose()).dot(y.reshape(-1,1))
 
 
-# In[ ]:
+# In[32]:
 
 
 coeffs
 
 
-# In[ ]:
+# In[33]:
 
 
-x_line = np.arange(-3,5).reshape(-1,1)
-y_line = (coeffs[1][0]) + x_line * coeffs[0][0]
-
-
-# In[ ]:
-
-
-plt.scatter(X,y,c='r',label='Original')
-plt.xlabel('X')
-plt.ylabel('y')
-plt.plot(x_line,y_line,label='predicted')
-plt.legend()
-plt.title('Close Form Solution : Dataset 2')
-plt.show()
-
-
-# In[ ]:
-
-
-
+y_pred = coeffs[0]* X_[:,0] + coeffs[1] * X_[:,1] + coeffs[2] * X_[:,2] + coeffs[3] * X_[:,3]
+print('R2 score For Dataset 2 (CFS) : ',r2_score(y,y_pred))
 
 
 # # <center>Dataset : 3</center>
 
-# In[309]:
+# In[34]:
 
 
 X, y = make_regression(n_samples=200,n_features=4,noise=20)
@@ -389,7 +340,7 @@ X, y = make_regression(n_samples=200,n_features=4,noise=20)
 
 # ## 1. Minimizing Sum of squared Error
 
-# In[310]:
+# In[35]:
 
 
 # No of examples 
@@ -406,7 +357,7 @@ theta = np.zeros((n,1))
 X_ = np.append(np.ones((m, 1)), X,axis=1)
 
 
-# In[311]:
+# In[36]:
 
 
 final_theta,loss = gradientDescent(X_, y, theta, 0.5, 100)
@@ -414,54 +365,43 @@ print('loss :',loss)
 print('final theta :',final_theta)
 
 
-# In[312]:
+# In[37]:
 
 
 y_pred = final_theta[0]* X_[:,0] + final_theta[1] * X_[:,1] + final_theta[2] * X_[:,2] + final_theta[3] * X_[:,3] + final_theta[4] * X_[:,4]
-
-
-# In[313]:
-
-
-print('R2 score For Dataset 1 (MSE): ',r2_score(y,y_pred))
+print('R2 score For Dataset 3 (MSE): ',r2_score(y,y_pred))
 
 
 # ## 2. Minimising sum of distance
 
-# In[ ]:
+# In[38]:
 
 
-a1,b1,c1 = line_total_least_squares(X.reshape(-1),y)
+final_theta = tls(X_,y)
 
 
-# In[ ]:
+# In[39]:
 
 
-x_line = np.arange(-5,5).reshape(-1,1)
-y_line = (-1*(c1/b1)) + x_line * -1*(a1/b1)
+final_theta
 
 
-# In[ ]:
+# In[40]:
 
 
-plt.scatter(X,y,c='r',label='Original')
-plt.xlabel('X')
-plt.ylabel('y')
-plt.plot(x_line,y_line,label='predicted')
-plt.legend()
-plt.title('Minimising sum of distance : Dataset 3')
-plt.show()
+y_pred = final_theta[0]* X_[:,0] + final_theta[1] * X_[:,1] + final_theta[2] * X_[:,2] + final_theta[3] * X_[:,3] + final_theta[4] * X_[:,4]
+print('R2 score For Dataset 3 (MSD): ',r2_score(y,y_pred))
 
 
 # ## 3. Closed Form Solution
 
-# In[ ]:
+# In[41]:
 
 
-X_ = np.append(X.reshape((-1,1)),np.ones((m, 1)) ,axis=1)
+X_ = np.append(X,np.ones((m, 1)) ,axis=1)
 
 
-# In[ ]:
+# In[42]:
 
 
 # calculate coefficients using closed-form solution
@@ -469,40 +409,22 @@ from numpy.linalg import inv
 coeffs = inv(X_.transpose().dot(X_)).dot(X_.transpose()).dot(y.reshape(-1,1))
 
 
-# In[ ]:
+# In[43]:
 
 
 coeffs
 
 
-# In[ ]:
+# In[44]:
 
 
-x_line = np.arange(-3,5).reshape(-1,1)
-y_line = (coeffs[1][0]) + x_line * coeffs[0][0]
-
-
-# In[ ]:
-
-
-plt.scatter(X,y,c='r',label='Original')
-plt.xlabel('X')
-plt.ylabel('y')
-plt.plot(x_line,y_line,label='predicted')
-plt.legend()
-plt.title('Close Form Solution : Dataset 3')
-plt.show()
-
-
-# In[ ]:
-
-
-
+y_pred = coeffs[0]* X_[:,0] + coeffs[1] * X_[:,1] + coeffs[2] * X_[:,2] + coeffs[3] * X_[:,3] + coeffs[4] * X_[:,4]
+print('R2 score For Dataset 3 (CFS) : ',r2_score(y,y_pred))
 
 
 # # <center>Dataset : 4</center>
 
-# In[314]:
+# In[45]:
 
 
 X, y = make_regression(n_samples=300,n_features=3,noise=15)
@@ -510,7 +432,7 @@ X, y = make_regression(n_samples=300,n_features=3,noise=15)
 
 # ## 1. Minimizing Sum of squared Error
 
-# In[317]:
+# In[46]:
 
 
 # No of examples 
@@ -527,7 +449,7 @@ theta = np.zeros((n,1))
 X_ = np.append(np.ones((m, 1)), X,axis=1)
 
 
-# In[318]:
+# In[47]:
 
 
 final_theta,loss = gradientDescent(X_, y, theta, 0.5, 100)
@@ -535,54 +457,48 @@ print('loss :',loss)
 print('final theta :',final_theta)
 
 
-# In[320]:
+# In[48]:
 
 
 y_pred = final_theta[0]* X_[:,0] + final_theta[1] * X_[:,1] + final_theta[2] * X_[:,2] + final_theta[3] * X_[:,3]
 
 
-# In[321]:
+# In[49]:
 
 
-print('R2 score For Dataset 1 (MSE): ',r2_score(y,y_pred))
+print('R2 score For Dataset 4 (MSE): ',r2_score(y,y_pred))
 
 
 # ## 2. Minimising sum of distance
 
-# In[ ]:
+# In[50]:
 
 
-a1,b1,c1 = line_total_least_squares(X.reshape(-1),y)
+final_theta = tls(X_,y)
 
 
-# In[ ]:
+# In[51]:
 
 
-x_line = np.arange(-5,5).reshape(-1,1)
-y_line = (-1*(c1/b1)) + x_line * -1*(a1/b1)
+final_theta
 
 
-# In[ ]:
+# In[52]:
 
 
-plt.scatter(X,y,c='r',label='Original')
-plt.xlabel('X')
-plt.ylabel('y')
-plt.plot(x_line,y_line,label='predicted')
-plt.legend()
-plt.title('Minimising sum of distance : Dataset 4')
-plt.show()
+y_pred = final_theta[0]* X_[:,0] + final_theta[1] * X_[:,1] + final_theta[2] * X_[:,2] + final_theta[3] * X_[:,3]
+print('R2 score For Dataset 4 (MSD): ',r2_score(y,y_pred))
 
 
 # ## 3. Closed Form Solution
 
-# In[ ]:
+# In[53]:
 
 
-X_ = np.append(X.reshape((-1,1)),np.ones((m, 1)) ,axis=1)
+X_ = np.append(X,np.ones((m, 1)) ,axis=1)
 
 
-# In[ ]:
+# In[54]:
 
 
 # calculate coefficients using closed-form solution
@@ -590,34 +506,22 @@ from numpy.linalg import inv
 coeffs = inv(X_.transpose().dot(X_)).dot(X_.transpose()).dot(y.reshape(-1,1))
 
 
-# In[ ]:
+# In[55]:
 
 
 coeffs
 
 
-# In[ ]:
+# In[56]:
 
 
-x_line = np.arange(-3,5).reshape(-1,1)
-y_line = (coeffs[1][0]) + x_line * coeffs[0][0]
-
-
-# In[ ]:
-
-
-plt.scatter(X,y,c='r',label='Original')
-plt.xlabel('X')
-plt.ylabel('y')
-plt.plot(x_line,y_line,label='predicted')
-plt.legend()
-plt.title('Close Form Solution : Dataset 4')
-plt.show()
+y_pred = coeffs[0]* X_[:,0] + coeffs[1] * X_[:,1] + coeffs[2] * X_[:,2] + coeffs[3] * X_[:,3] 
+print('R2 score For Dataset 4 (CFS) : ',r2_score(y,y_pred))
 
 
 # # <center>Dataset : 5</center>
 
-# In[322]:
+# In[57]:
 
 
 X, y = make_regression(n_samples=500,n_features=5,noise=25)
@@ -625,7 +529,7 @@ X, y = make_regression(n_samples=500,n_features=5,noise=25)
 
 # ## 1. Minimizing Sum of squared Error
 
-# In[323]:
+# In[58]:
 
 
 # No of examples 
@@ -642,7 +546,7 @@ theta = np.zeros((n,1))
 X_ = np.append(np.ones((m, 1)), X,axis=1)
 
 
-# In[324]:
+# In[59]:
 
 
 final_theta,loss = gradientDescent(X_, y, theta, 0.5, 500)
@@ -650,55 +554,52 @@ print('loss :',loss)
 print('final theta :',final_theta)
 
 
-# In[327]:
+# In[60]:
 
 
 y_pred = final_theta[0]* X_[:,0] + final_theta[1] * X_[:,1] + final_theta[2] * X_[:,2] +          final_theta[3] * X_[:,3] + final_theta[4] * X_[:,4] + final_theta[5] * X_[:,5]
 
 
 
-# In[328]:
+# In[61]:
 
 
-print('R2 score For Dataset 1 (MSE): ',r2_score(y,y_pred))
+print('R2 score For Dataset 5 (MSE): ',r2_score(y,y_pred))
 
 
 # ## 2. Minimising sum of distance
 
-# In[ ]:
+# In[62]:
 
 
-a1,b1,c1 = line_total_least_squares(X.reshape(-1),y)
+final_theta = tls(X_,y)
 
 
-# In[ ]:
+# In[63]:
 
 
-x_line = np.arange(-5,5).reshape(-1,1)
-y_line = (-1*(c1/b1)) + x_line * -1*(a1/b1)
+final_theta
 
 
-# In[ ]:
+# In[64]:
 
 
-plt.scatter(X,y,c='r',label='Original')
-plt.xlabel('X')
-plt.ylabel('y')
-plt.plot(x_line,y_line,label='predicted')
-plt.legend()
-plt.title('Minimising sum of distance : Dataset 5')
-plt.show()
+y_pred = final_theta[0]* X_[:,0] + final_theta[1] * X_[:,1] + final_theta[2] * X_[:,2] +          final_theta[3] * X_[:,3] + final_theta[4] * X_[:,4] + final_theta[5] * X_[:,5]
+
+
+
+print('R2 score For Dataset 5 (MSD): ',r2_score(y,y_pred))
 
 
 # ## 3. Closed Form Solution
 
-# In[ ]:
+# In[65]:
 
 
-X_ = np.append(X.reshape((-1,1)),np.ones((m, 1)) ,axis=1)
+X_ = np.append(X,np.ones((m, 1)) ,axis=1)
 
 
-# In[ ]:
+# In[66]:
 
 
 # calculate coefficients using closed-form solution
@@ -706,29 +607,18 @@ from numpy.linalg import inv
 coeffs = inv(X_.transpose().dot(X_)).dot(X_.transpose()).dot(y.reshape(-1,1))
 
 
-# In[ ]:
+# In[67]:
 
 
 coeffs
 
 
-# In[ ]:
+# In[68]:
 
 
-x_line = np.arange(-3,5).reshape(-1,1)
-y_line = (coeffs[1][0]) + x_line * coeffs[0][0]
+y_pred = coeffs[0]* X_[:,0] + coeffs[1] * X_[:,1] + coeffs[2] * X_[:,2] +          coeffs[3] * X_[:,3] + coeffs[4] * X_[:,4] + coeffs[5] * X_[:,5]
 
-
-# In[ ]:
-
-
-plt.scatter(X,y,c='r',label='Original')
-plt.xlabel('X')
-plt.ylabel('y')
-plt.plot(x_line,y_line,label='predicted')
-plt.legend()
-plt.title('Close Form Solution : Dataset 5')
-plt.show()
+print('R2 score For Dataset 5 (CFS) : ',r2_score(y,y_pred))
 
 
 # In[ ]:
