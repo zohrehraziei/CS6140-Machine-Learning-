@@ -1,10 +1,7 @@
-# -*- coding: utf-8 -*-
-"""
-Principal Component Analysis (PCA)
 
-Author: Zohreh Raziei - raziei.z@husky.neu.edu
-"""
 
+#!/usr/bin/env python
+# coding: utf-8
 
 # In[1]:
 
@@ -239,7 +236,7 @@ def LG(train_set, test_set):
 
 
 # Evaluate an algorithm using a cross validation split
-def evaluate_algorithm(dataset, algorithm, n_folds):
+def evaluate_algorithm(dataset, algorithm, n_folds,title):
     
     folds = cross_validation_split(dataset, n_folds)
     
@@ -267,49 +264,55 @@ def evaluate_algorithm(dataset, algorithm, n_folds):
     mean_tpr = np.mean(tprs, axis=0)
     mean_auc = auc(mean_fpr, mean_tpr)
     
+    mean_tpr[0] = 0
+    mean_fpr[0] = 0
     
     plt.plot(mean_fpr, mean_tpr, color='r',
-            lw=2, alpha=.8)
-    plt.plot([0, 1], ls="--")
-    plt.plot([0, 0], [1, 0] , c=".7"), plt.plot([1, 1] , c=".7")
+            lw=2, alpha=1,label=r'Mean ROC (AUC = %0.5f)' % (mean_auc))
+    plt.plot([0, 1], ls="--",label='Random chances')
+   # plt.plot([0, 0], [1, 0] , c=".7"), plt.plot([1, 1] , c=".7")
     plt.ylabel('True Positive Rate')
     plt.xlabel('False Positive Rate')
+    plt.title(title)
+    plt.legend()
+    plt.grid(True)
     plt.show()
+    print(title)
+    print('Area under ROC ',mean_auc,'\n\n')
     
-    print('Area under ROC ',mean_auc)
     
     return None
 
 
 # ### 1.banknote authentication Data
 
-# In[22]:
+# In[20]:
 
 
-evaluate_algorithm(df1.values.tolist(),LG,10)
+evaluate_algorithm(df1.values.tolist(),LG,10,'With Logistic Regression - banknote authentication Data')
 
 
 # ### 2. Diabetic dataset
 
-# In[23]:
+# In[21]:
 
 
-evaluate_algorithm(df2.values.tolist(),LG,10)
+evaluate_algorithm(df2.values.tolist(),LG,10,'With Logistic Regression - Diabetic dataset')
 
 
 # ### 3. Breast Cancer Wisconsin (Diagnostic) Data Set
 
-# In[24]:
+# In[22]:
 
 
-evaluate_algorithm(df3.values.tolist(),LG,10)
+evaluate_algorithm(df3.values.tolist(),LG,10,'With Logistic Regression - Breast Cancer Wisconsin Data')
 
 
 # ## 2. Logostic Regression with z-score normalisation
 
 # ### 1. banknote authentication Data
 
-# In[25]:
+# In[23]:
 
 
 cols = df1.columns.tolist()[:-1]
@@ -319,15 +322,15 @@ for col in cols:
     df1_z_norm[col] = (df1[col] - df1[col].mean())/df1[col].std(ddof=0)
 
 
-# In[26]:
+# In[24]:
 
 
-evaluate_algorithm(df1_z_norm.values.tolist(),LG,10)
+evaluate_algorithm(df1_z_norm.values.tolist(),LG,10,'Logostic Regression with z-score normalisation - banknote authentication Data')
 
 
 # ### 2. Diabetic dataset
 
-# In[27]:
+# In[25]:
 
 
 cols = df2.columns.tolist()[:-1]
@@ -337,15 +340,15 @@ for col in cols:
     df2_z_norm[col] = (df2[col] - df2[col].mean())/df2[col].std(ddof=0)
 
 
-# In[28]:
+# In[26]:
 
 
-evaluate_algorithm(df2_z_norm.values.tolist(),LG,10)
+evaluate_algorithm(df2_z_norm.values.tolist(),LG,10, 'Logostic Regression with z-score normalisation - Diabetic dataset')
 
 
 # ### 3. Breast Cancer Wisconsin (Diagnostic) Data Set
 
-# In[29]:
+# In[27]:
 
 
 cols = df3.columns.tolist()[:-1]
@@ -355,15 +358,15 @@ for col in cols:
     df3_z_norm[col] = (df3[col] - df3[col].mean())/df3[col].std(ddof=0)
 
 
-# In[30]:
+# In[28]:
 
 
-evaluate_algorithm(df3_z_norm.values.tolist(),LG,10)
+evaluate_algorithm(df3_z_norm.values.tolist(),LG,10,'Logostic Regression with z-score normalisation - Breast Cancer Wisconsin Data ')
 
 
 # # Dataset with z-score normalisation and PCA 
 
-# In[31]:
+# In[29]:
 
 
 def PCA(feature,retained_variance):
@@ -388,7 +391,7 @@ def PCA(feature,retained_variance):
 
 # ### 1. banknote authentication Data
 
-# In[32]:
+# In[30]:
 
 
 cols = df1.columns.tolist()[:-1]
@@ -398,22 +401,22 @@ for col in cols:
     df1_z_norm[col] = (df1[col] - df1[col].mean(axis=0))/df1[col].std(ddof=0,axis=0)
 
 
-# In[33]:
+# In[31]:
 
 
 feature = PCA(df1_z_norm.iloc[:,:-1].values,0.99)
 new_df = np.hstack((feature,df1_z_norm.iloc[:,-1].values.reshape(-1,1)))
 
 
-# In[34]:
+# In[32]:
 
 
-evaluate_algorithm(new_df.tolist(),LG,10)
+evaluate_algorithm(new_df.tolist(),LG,10,'PCA with z-score normalization - banknote authentication data')
 
 
 # ### 2. Diabetic dataset
 
-# In[35]:
+# In[33]:
 
 
 cols = df2.columns.tolist()[:-1]
@@ -423,22 +426,22 @@ for col in cols:
     df2_z_norm[col] = (df2[col] - df2[col].mean(axis=0))/df2[col].std(ddof=0,axis=0)
 
 
-# In[36]:
+# In[34]:
 
 
 feature = PCA(df2_z_norm.iloc[:,:-1].values,0.99)
 new_df = np.hstack((feature,df2_z_norm.iloc[:,-1].values.reshape(-1,1)))
 
 
-# In[37]:
+# In[35]:
 
 
-evaluate_algorithm(new_df.tolist(),LG,10)
+evaluate_algorithm(new_df.tolist(),LG,10,'PCA with z-score normalization -  Diabetic data')
 
 
 # ### 3. Breast Cancer Wisconsin (Diagnostic) Data Set
 
-# In[38]:
+# In[36]:
 
 
 cols = df3.columns.tolist()[:-1]
@@ -448,24 +451,24 @@ for col in cols:
     df3_z_norm[col] = (df3[col] - df3[col].mean(axis=0))/df3[col].std(ddof=0,axis=0)
 
 
-# In[39]:
+# In[37]:
 
 
 feature = PCA(df3_z_norm.iloc[:,:-1].values,0.99)
 new_df = np.hstack((feature,df3_z_norm.iloc[:,-1].values.reshape(-1,1)))
 
 
-# In[40]:
+# In[38]:
 
 
-evaluate_algorithm(new_df.tolist(),LG,10)
+evaluate_algorithm(new_df.tolist(),LG,10, 'PCA with z-score normalization -  Breast Cancer data')
 
 
 # # Dataset with zero mean normalisation and PCA 
 
 # ### 1. banknote authentication Data
 
-# In[41]:
+# In[39]:
 
 
 cols = df1.columns.tolist()[:-1]
@@ -475,22 +478,22 @@ for col in cols:
     df1_zero_norm[col] = (df1[col] - df1[col].min())/(df1[col].max() - df1[col].min())
 
 
-# In[42]:
+# In[40]:
 
 
 feature = PCA(df1_zero_norm.iloc[:,:-1].values,0.99)
 new_df = np.hstack((feature,df1_zero_norm.iloc[:,-1].values.reshape(-1,1)))
 
 
-# In[43]:
+# In[41]:
 
 
-evaluate_algorithm(new_df.tolist(),LG,10)
+evaluate_algorithm(new_df.tolist(),LG,10,'PCA with zero mean normalization -  banknote authentication Data')
 
 
 # ### 2. Diabetic dataset
 
-# In[44]:
+# In[42]:
 
 
 cols = df2.columns.tolist()[:-1]
@@ -500,22 +503,22 @@ for col in cols:
     df2_zero_norm[col] = (df2[col] - df2[col].min())/(df2[col].max() - df2[col].min())
 
 
-# In[45]:
+# In[43]:
 
 
 feature = PCA(df2_zero_norm.iloc[:,:-1].values,0.99)
 new_df = np.hstack((feature,df2_zero_norm.iloc[:,-1].values.reshape(-1,1)))
 
 
-# In[46]:
+# In[44]:
 
 
-evaluate_algorithm(new_df.tolist(),LG,10)
+evaluate_algorithm(new_df.tolist(),LG,10,'PCA with zero mean normalization -  Diabetic Data')
 
 
 # ### 3. Breast Cancer Wisconsin (Diagnostic) Data Set
 
-# In[47]:
+# In[45]:
 
 
 cols = df3.columns.tolist()[:-1]
@@ -525,29 +528,17 @@ for col in cols:
     df3_zero_norm[col] = (df3[col] - df3[col].min())/(df3[col].max() - df3[col].min())
 
 
-# In[48]:
+# In[46]:
 
 
 feature = PCA(df3_zero_norm.iloc[:,:-1].values,0.99)
 new_df = np.hstack((feature,df3_z_norm.iloc[:,-1].values.reshape(-1,1)))
 
 
-# In[49]:
+# In[47]:
 
 
-evaluate_algorithm(new_df.tolist(),LG,10)
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
+evaluate_algorithm(new_df.tolist(),LG,10, 'PCA with zero mean normalization -  Breast Cancer Wisconsin Data')
 
 
 # In[ ]:
@@ -558,7 +549,7 @@ evaluate_algorithm(new_df.tolist(),LG,10)
 
 # ## Finish
 
-# In[50]:
+# In[48]:
 
 
 #Plotting the Cumulative Summation of the Explained Variance
