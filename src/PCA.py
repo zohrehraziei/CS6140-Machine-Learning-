@@ -1,7 +1,10 @@
 
 
-#!/usr/bin/env python
-# coding: utf-8
+"""
+Principal Component Analysis (PCA)
+
+Author: Zohreh Raziei - raziei.z@husky.neu.edu
+"""
 
 # In[1]:
 
@@ -237,7 +240,7 @@ def LG(train_set, test_set):
 
 # Evaluate an algorithm using a cross validation split
 def evaluate_algorithm(dataset, algorithm, n_folds,title):
-    
+    # get the list of dataset after k-fold valiation
     folds = cross_validation_split(dataset, n_folds)
     
     scores = list()
@@ -370,20 +373,27 @@ evaluate_algorithm(df3_z_norm.values.tolist(),LG,10,'Logostic Regression with z-
 
 
 def PCA(feature,retained_variance):
+    # calculate covariance matrix
     covariance_matrix = np.cov(feature, rowvar=False)
+    # Calculate eigen value and Eigen vector of the covariance matrix
     eigenvalues, eigenvectors, = np.linalg.eig(covariance_matrix)
+    # calculate average cumulative significance of the eigenvalue
     significance = [np.abs(i)/np.sum(eigenvalues) for i in eigenvalues]
-
+    # make a set of eigen values and engine vector
     together = zip(eigenvalues, eigenvectors)
+    # sorted the list based on the eigen value
     together = sorted(together, key=lambda t: t[0], reverse=True)
+    # sorted values saved in the eigen value and eigen vector variable
     eigenvalues[:], eigenvectors[:] = zip(*together)
-
+    # get the minimum index in which significance value is reaching 99% variance
     index_t = [np.cumsum(significance) <= retained_variance][0]
-    #print(index_t)
+    # take the n_component value based on that index value
     n_component = np.where(index_t == False)[0][0]
         
     #n_component = 10
+    # take upto first n_component in eigenvector
     principal_components = eigenvectors[:n_component]
+    # make the projection matrix 
     projections = feature.dot(principal_components.T)
 
     return projections
