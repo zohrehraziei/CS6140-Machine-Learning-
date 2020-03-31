@@ -246,18 +246,23 @@ def evaluate_algorithm(dataset, algorithm, n_folds,title):
     scores = list()
     tprs = []
     fprs = []
-        
-    mean_fpr = np.linspace(0,1,100)
     
+    # initialize mean fpr from 0 to 1    
+    mean_fpr = np.linspace(0,1,100)
+    # iteration through each fold
     for i,fold in enumerate(folds):
+        # get train set and remove it from fold
         train_set = list(folds)
         train_set.remove(fold)
+        # Take every other fold as train set
         train_set = sum(train_set, [])
+        # Take each fold as test set
         test_set = list()
         for row in fold:
             row_copy = list(row)
             test_set.append(row_copy)
-
+            
+        # # calculate fpr, tpr, auc_score for each iterate  
         fpr, tpr, auc_score = LG(train_set, test_set)
         tprs.append(interp(mean_fpr, fpr, tpr))     
         scores.append(auc_score)
@@ -562,17 +567,6 @@ evaluate_algorithm(new_df.tolist(),LG,10, 'PCA with zero mean normalization -  B
 # In[48]:
 
 
-#Plotting the Cumulative Summation of the Explained Variance
-#plt.figure()
-#plt.plot(np.cumsum(significance),color='red')
-#plt.axvline(x=n_component)
-#plt.xlabel('Number of Components')
-#plt.ylabel('Variance (%)') #for each component
-#plt.title('Pulsar Dataset Explained Variance')
-#plt.show()
-
-
-# In[ ]:
 
 
 
