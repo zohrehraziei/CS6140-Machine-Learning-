@@ -3,7 +3,8 @@
 """
 Principal Component Analysis (PCA)
 
-Author: Zohreh Raziei - raziei.z@husky.neu.edu
+@author: raziei.z@husky.neu.edu
+
 """
 
 # In[1]:
@@ -271,6 +272,7 @@ def evaluate_algorithm(dataset, algorithm, n_folds,title):
 
     mean_tpr = np.mean(tprs, axis=0)
     mean_auc = auc(mean_fpr, mean_tpr)
+    print('\n\nAll AUC-ROC scores from the K-fold',scores,'\n')
     
     mean_tpr[0] = 0
     mean_fpr[0] = 0
